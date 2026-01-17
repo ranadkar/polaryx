@@ -1,9 +1,38 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 html,
 body {
   margin: 0;
   padding: 0;
-  height: 100vh;
-  width: 100vw;
-  background-color: $bg-color;
-  color: $text-color;
+  min-height: 100vh;
+    width: 100%;
+    background-color: #FAF9F6;
+    color: #0F172A;
+    font-family: 'Manrope', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  #root {
+    min-height: 100vh;
+  }
+  
+  ::selection {
+    background-color: #2563EB;
+    color: white;
+  }
+  
+  a {
+    text-decoration: none;
+  }
+  
+  button {
+    font-family: inherit;
+  }
+  
+  input {
+    font-family: inherit;
 }
