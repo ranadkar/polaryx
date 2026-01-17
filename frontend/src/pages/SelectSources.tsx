@@ -141,6 +141,14 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
     // Get subreddit for Reddit posts
     const subreddit = result.subreddit || '';
 
+    // Helper to truncate text
+    const truncateText = (text: string, maxLength: number) => {
+        if (!text) return '';
+        return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    };
+
+    const displaySource = isReddit && subreddit ? `r/${subreddit}` : result.source;
+
     return (
         <div
             className={`${styles.card} ${cardClass} ${isSelected ? styles.cardSelected : ''}`}
@@ -162,11 +170,13 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
                         </div>
                     )}
                     <div className={styles.sourceTextGroup}>
-                        <h3 className={styles.sourceName}>
-                            {isReddit && subreddit ? `r/${subreddit}` : result.source}
+                        <h3 className={styles.sourceName} title={displaySource}>
+                            {truncateText(displaySource, 10)}
                         </h3>
                         {authorDisplay && (
-                            <p className={styles.cardAuthor}>By {authorDisplay}</p>
+                            <p className={styles.cardAuthor} title={authorDisplay}>
+                                By {truncateText(authorDisplay, 15)}
+                            </p>
                         )}
                     </div>
                 </div>
@@ -174,6 +184,16 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
                     {date && (
                         <span className={styles.cardDate}>{formatDate(date)}</span>
                     )}
+                    <a
+                        href={result.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.externalLink}
+                        onClick={(e) => e.stopPropagation()}
+                        title="Open source"
+                    >
+                        <span className="material-symbols-outlined">open_in_new</span>
+                    </a>
                     <input
                         type="checkbox"
                         className={`${styles.checkbox} ${checkboxClass}`}
