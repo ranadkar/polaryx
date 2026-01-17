@@ -13,12 +13,12 @@ bluesky_password = os.getenv("BLUESKY_APP_PASSWORD")
 analyzer = SentimentIntensityAnalyzer()
 
 
-async def search_bluesky(client, query: str, sort: str = "latest", limit: int = 50):
+async def search_bluesky(client, query: str, sort: str = "top", limit: int = 50):
     if not query:
         return None
 
     if sort not in ["latest", "top"]:
-        sort = "latest"
+        sort = "top"
 
     limit = min(limit, 100)
     posts = []
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     
     async def main():
         query = sys.argv[1] if len(sys.argv) > 1 else input("Enter your search query: ").strip()
-        sort = sys.argv[2] if len(sys.argv) > 2 else (input("Sort by (latest/top, default: latest): ").strip() or "latest")
+        sort = sys.argv[2] if len(sys.argv) > 2 else (input("Sort by (latest/top, default: top): ").strip() or "top")
         limit = int(sys.argv[3]) if len(sys.argv) > 3 else (int(input("How many posts to retrieve? (default: 50, max: 100): ").strip() or "50"))
         
         client = AsyncClient()
