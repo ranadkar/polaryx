@@ -56,27 +56,28 @@ reddit = asyncpraw.Reddit(
 )
 
 
-async def classify_bias(title: str, content: str) -> str:
+async def classify_bias(title: str, content: str, subreddit: str = "") -> str:
     """Use OpenAI to classify political bias of a post as 'left' or 'right'."""
     try:
+        subreddit_info = f"\nSubreddit: r/{subreddit}" if subreddit else ""
         prompt = f"""Analyze the political bias of this social media post. Classify it as either 'left' (liberal/progressive) or 'right' (conservative).
 
 Title: {title}
-Content: {content[:500]}
+Content: {content[:500]}{subreddit_info}
 
 Respond with ONLY one word: either 'left' or 'right'."""
 
         response = await asyncio.to_thread(
             client.chat.completions.create,
-            model="gpt-5-nano",
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
         )
 
         bias = response.choices[0].message.content.strip().lower()
-        return bias if bias in ["left", "right"] else "neutral"
+        return bias if bias in ["left", "right"] else "left"
     except Exception as e:
         print(f"Error classifying bias: {e}")
-        return "neutral"
+        return "left"
 
 
 @app.get("/")
@@ -135,7 +136,7 @@ async def search(q: str):
 
     # Classify bias for Reddit posts using Gemini
     bias_tasks = [
-        classify_bias(post["title"], post.get("contents", "")) for post in reddit_posts
+        classify_bias(post["title"], post.get("contents", ""), post.get("subreddit", "")) for post in reddit_posts
     ]
     biases = await asyncio.gather(*bias_tasks)
 

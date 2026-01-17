@@ -2,8 +2,6 @@ import os
 from dotenv import load_dotenv
 import asyncpraw
 import asyncio
-import time
-import json
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 load_dotenv()
@@ -20,8 +18,13 @@ async def search_reddit(reddit, query: str, subreddit_name: str = "all", limit: 
     posts = []
     
     subreddit = await reddit.subreddit(subreddit_name)
-    async for submission in subreddit.search(query, limit=limit, sort="relevance"):
-        text_content = submission.title + " " + (submission.selftext or "")
+    # Fetch more posts to account for filtered link posts
+    async for submission in subreddit.search(query, limit=limit * 3, sort="relevance"):
+        # Skip link posts (posts without text content)
+        if not submission.selftext:
+            continue
+            
+        text_content = submission.title + " " + submission.selftext
         sentiment_scores = analyzer.polarity_scores(text_content)
         compound_score = sentiment_scores["compound"]
 
@@ -35,50 +38,22 @@ async def search_reddit(reddit, query: str, subreddit_name: str = "all", limit: 
             "source": "Reddit",
             "id": submission.id,
             "title": submission.title,
-            "username": f"u/{submission.author.name}" if submission.author else "u/[deleted]",
-            "handle": submission.author.name if submission.author else "[deleted]",
-            "contents": submission.selftext[:500] if submission.selftext else "[Link post]",
-            "platform": "reddit",
+            "author": f"u/{submission.author.name}" if submission.author else "u/[deleted]",
+            "contents": submission.selftext[:500],
             "date": submission.created_utc,
-            "created_utc": submission.created_utc,
             "sentiment": sentiment_category,
             "sentiment_score": compound_score,
             "score": submission.score,
-            "likes": submission.score,
             "num_comments": submission.num_comments,
             "url": f"https://reddit.com{submission.permalink}",
             "subreddit": submission.subreddit.display_name if submission.subreddit else "unknown",
         })
+        
+        # Stop once we have enough posts with actual content
+        if len(posts) >= limit:
+            break
 
     return posts
-    if not posts:
-        return None
-
-    # Calculate overall sentiment
-    avg_score = sum(p["sentiment_score"] for p in posts) / len(posts)
-    overall_sentiment = (
-        "Positive sentiment" if avg_score >= 0.05 
-        else "Negative sentiment" if avg_score <= -0.05 
-        else "Neutral sentiment"
-    )
-
-    # Save results
-    output_file = f"sentiment_analysis_{subreddit_name}_{query.replace(' ', '_')}_{len(posts)}.json"
-    result = {
-        "query": query,
-        "subreddit": subreddit_name,
-        "overall_sentiment": overall_sentiment,
-        "average_score": avg_score,
-        "post_count": len(posts),
-        "posts": posts,
-        "timestamp": time.time(),
-    }
-    
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
-
-    print(f"Analysis complete. Saved to: {output_file}")
-    return result
 
 
 if __name__ == "__main__":
