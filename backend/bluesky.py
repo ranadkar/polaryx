@@ -30,6 +30,11 @@ async def search_bluesky(client, query: str, sort: str = "latest", limit: int = 
 
     for post in response.posts[:limit]:
         text_content = post.record.text if hasattr(post.record, "text") else ""
+        
+        # Skip posts with no text content (video-only posts)
+        if not text_content or not text_content.strip():
+            continue
+        
         sentiment_scores = analyzer.polarity_scores(text_content)
         compound_score = sentiment_scores["compound"]
 
@@ -79,8 +84,6 @@ async def search_bluesky(client, query: str, sort: str = "latest", limit: int = 
         else "Neutral sentiment"
     )
 
-    # Save results
-    output_file = f"sentiment_analysis_bluesky_{query.replace(' ', '_')}_{len(posts)}.json"
     result = {
         "query": query,
         "platform": "bluesky",
@@ -91,11 +94,8 @@ async def search_bluesky(client, query: str, sort: str = "latest", limit: int = 
         "posts": posts,
         "timestamp": time.time(),
     }
-    
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
 
-    print(f"Analysis complete. Saved to: {output_file}")
+    print(f"Analysis complete. Retrieved {len(posts)} posts.")
     return result
 
 
