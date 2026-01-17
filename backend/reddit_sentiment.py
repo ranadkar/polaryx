@@ -50,6 +50,7 @@ async def search_reddit(reddit, query: str, subreddit_name: str = "all", limit: 
             "subreddit": submission.subreddit.display_name if submission.subreddit else "unknown",
         })
 
+    return posts
     if not posts:
         return None
 
