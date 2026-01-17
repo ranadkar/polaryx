@@ -3,6 +3,11 @@ from dotenv import load_dotenv
 import asyncpraw
 import random
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import asyncio
+import json
+import time
+from datetime import datetime
+
 
 load_dotenv()
 app_id = os.getenv("REDDIT_CLIENT_ID")
@@ -19,49 +24,8 @@ def get_async_reddit():
     )
 
 
-async def test_scrape():
-    import asyncio
-    
-    reddit = get_async_reddit()
-    
-    # Test by fetching hot posts from r/conservative
-    subreddit = await reddit.subreddit("conservative")
-    print(f"Testing Reddit scraping from r/conservative...\n")
-    
-    count = 0
-    try:
-        async for submission in subreddit.hot(limit=5):
-            count += 1
-            print(f"Post {count}:")
-            print(f"  Title: {submission.title}")
-            print(f"  Score: {submission.score}")
-            print(f"  Comments: {submission.num_comments}")
-            
-            # Analyze sentiment
-            sentiment = analyzer.polarity_scores(submission.title)
-            print(f"  Sentiment: {sentiment}")
-            print()
-            
-            # Add delay to avoid rate limiting (Reddit recommends max 60 requests per minute)
-            await asyncio.sleep(0.2)
-    
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        if "429" in str(e) or "rate" in str(e).lower():
-            print("Rate limit hit! Waiting before retry...")
-            await asyncio.sleep(60)
-    
-    finally:
-        await reddit.close()
-        print(f"Successfully scraped {count} posts!")
-
-
 async def scrape_subreddit_posts():
-    import asyncio
-    import json
-    import time
-    from datetime import datetime
-    
+  
     reddit = get_async_reddit()
     
     try:
