@@ -76,14 +76,14 @@ articles_by_url = {}
 
 # Outlet configuration mapping
 OUTLETS = {
-    "cnn.com": {"source": "CNN", "bias": "left"},
-    "cbsnews.com": {"source": "CBS News", "bias": "left"},
-    "nbcnews.com": {"source": "NBC News", "bias": "left"},
-    "abcnews.go.com": {"source": "ABC News", "bias": "left"},
-    "foxnews.com": {"source": "Fox News", "bias": "right"},
-    "breitbart.com": {"source": "Breitbart", "bias": "right"},
-    "nypost.com": {"source": "NY Post", "bias": "right"},
-    "oann.com": {"source": "OANN", "bias": "right"},
+    "cnn.com": {"source": "CNN", "bias": "left", "scraper": fetch_cnn},
+    "cbsnews.com": {"source": "CBS News", "bias": "left", "scraper": fetch_cbs},
+    "nbcnews.com": {"source": "NBC News", "bias": "left", "scraper": fetch_nbc},
+    "abcnews.go.com": {"source": "ABC News", "bias": "left", "scraper": fetch_abc},
+    "foxnews.com": {"source": "Fox News", "bias": "right", "scraper": fetch_fox},
+    "breitbart.com": {"source": "Breitbart", "bias": "right", "scraper": fetch_breitbart},
+    "nypost.com": {"source": "NY Post", "bias": "right", "scraper": fetch_nypost},
+    "oann.com": {"source": "OANN", "bias": "right", "scraper": fetch_oann},
 }
 
 
@@ -251,6 +251,71 @@ async def search(q: str):
         articles_by_url[post["url"]] = post
 
     return outputs
+
+
+@app.get("/summary")
+async def summary(url: str):
+    """Generate a summary for a given article URL."""
+    # Check if the URL exists in our cache
+    if url not in articles_by_url:
+        return {"error": "URL not found. Please search for content first."}
+    
+    article = articles_by_url[url]
+    source = article.get("source", "")
+    
+    # Determine if this is a news article that needs scraping
+    if source in ["CNN", "CBS News", "NBC News", "ABC News", "Fox News", "Breitbart", "NY Post", "OANN"]:
+        # Find the appropriate scraper
+        scraper = None
+        for domain, info in OUTLETS.items():
+            if domain in url:
+                scraper = info.get("scraper")
+                break
+        
+        if scraper:
+            try:
+                # Scrape the full content
+                full_content = await asyncio.to_thread(scraper, url)
+                content_to_summarize = full_content
+            except Exception as e:
+                print(f"Error scraping {url}: {e}")
+                # Fallback to existing content
+                content_to_summarize = article.get("contents", "")
+        else:
+            content_to_summarize = article.get("contents", "")
+    else:
+        # Reddit or Bluesky - use existing content
+        content_to_summarize = article.get("contents", "")
+    
+    # Generate summary using OpenAI
+    try:
+        title = article.get("title", "")
+        prompt = f"""Provide a concise summary (3-5 sentences) of the following article. The summary MUST be in English, regardless of the original language.
+
+Title: {title}
+
+Content:
+{content_to_summarize[:3000]}
+
+Summary (in English):"""
+
+        response = await asyncio.to_thread(
+            client.chat.completions.create,
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": prompt}],
+        )
+
+        summary_text = response.choices[0].message.content.strip()
+        
+        return {
+            "url": url,
+            "title": title,
+            "source": source,
+            "summary": summary_text
+        }
+    except Exception as e:
+        print(f"Error generating summary: {e}")
+        return {"error": f"Failed to generate summary: {str(e)}"}
 
 
 if __name__ == "__main__":
