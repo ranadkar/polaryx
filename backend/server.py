@@ -1,6 +1,7 @@
 import uvicorn
 import asyncio
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from search_news import search_news
 from scrapers.cnn import fetch_cnn
 from scrapers.fox import fetch_fox
@@ -13,6 +14,14 @@ load_dotenv()
 
 client = OpenAI()
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 async def classify_bias(title: str, content: str) -> str:
