@@ -311,7 +311,7 @@ const Landing = () => {
             <div className={styles.footerBrand}>
               <div className={styles.footerLogo}>
                 <span className="material-symbols-outlined">balance</span>
-                <span className={styles.footerLogoText}>Polarys.</span>
+                <span className={styles.footerLogoText}>Polaryx.</span>
               </div>
               <p className={styles.footerTagline}>
                 An advanced analytical framework for the modern citizen. We believe that clarity in disagreement is the first step toward national health.

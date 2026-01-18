@@ -386,7 +386,7 @@ const SelectSources = () => {
                             <div className={styles.logoIcon}>
                                 <span className="material-symbols-outlined">balance</span>
                             </div>
-                            <span className={styles.logoText} onClick={() => navigate('/')}>Polarys.</span>
+                            <span className={styles.logoText} onClick={() => navigate('/')}>Polaryx.</span>
                         </div>
                         <div className={styles.divider}></div>
                         <div className={styles.topicBadge}>

@@ -11,7 +11,7 @@ const LandingNav = () => {
                     <div className={styles.logoIcon} onClick={() => navigate('/')}>
                         <span className="material-symbols-outlined">balance</span>
                     </div>
-                    <span className={styles.logoText} onClick={() => navigate('/')}>Polarys.</span>
+                    <span className={styles.logoText} onClick={() => navigate('/')}>Polaryx.</span>
                 </div>
                 <nav className={styles.nav}>
                     <a className={styles.navLink} href="#methodology">Methodology</a>

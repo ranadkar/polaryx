@@ -66,18 +66,12 @@ const DashboardAnalysis = ({ onSwitchToFeed: _onSwitchToFeed }: DashboardAnalysi
             ? rightScores.reduce((a, b) => a + b, 0) / rightScores.length
             : 0;
 
-        // Convert from -1 to 1 range to 0 to 10 range
-        // -1 = 0 (hostile), 0 = 5 (neutral), 1 = 10 (constructive)
-        const leftScore = ((avgLeft + 1) / 2) * 10;
-        const rightScore = ((avgRight + 1) / 2) * 10;
-
         // Calculate position for the indicator (0-100%)
+        // Maps -1 to 0%, 0 to 50%, 1 to 100%
         const leftPosition = ((avgLeft + 1) / 2) * 100;
         const rightPosition = ((avgRight + 1) / 2) * 100;
 
         return {
-            leftScore: leftScore.toFixed(1),
-            rightScore: rightScore.toFixed(1),
             leftPosition,
             rightPosition,
             leftRaw: avgLeft,
@@ -122,11 +116,11 @@ ${sectionDivider}
 ${sectionDivider}
 
 CONSERVATIVE BASE
-  Sentiment Score: ${sentimentStats.rightScore}/10
+  Sentiment Score: ${sentimentStats.rightRaw.toFixed(2)} (range: -1 to 1)
   Position: ${sentimentStats.rightRaw > 0 ? 'Constructive' : sentimentStats.rightRaw < -0.3 ? 'Hostile' : 'Neutral'}
 
 LIBERAL BASE
-  Sentiment Score: ${sentimentStats.leftScore}/10
+  Sentiment Score: ${sentimentStats.leftRaw.toFixed(2)} (range: -1 to 1)
   Position: ${sentimentStats.leftRaw > 0 ? 'Constructive' : sentimentStats.leftRaw < -0.3 ? 'Hostile' : 'Neutral'}
 
 ${sectionDivider}
@@ -209,8 +203,7 @@ ${divider}
                             </div>
                             <div className={styles.scoreDisplay}>
                                 <span className={`${styles.scoreValue} ${styles.scoreRed}`}>
-                                    {sentimentStats.rightScore}
-                                    <span className={styles.scoreMax}>/10</span>
+                                    {sentimentStats.rightRaw.toFixed(2)}
                                 </span>
                             </div>
                         </div>
@@ -266,8 +259,7 @@ ${divider}
                             </div>
                             <div className={styles.scoreDisplay}>
                                 <span className={`${styles.scoreValue} ${styles.scoreBlue}`}>
-                                    {sentimentStats.leftScore}
-                                    <span className={styles.scoreMax}>/10</span>
+                                    {sentimentStats.leftRaw.toFixed(2)}
                                 </span>
                             </div>
                         </div>

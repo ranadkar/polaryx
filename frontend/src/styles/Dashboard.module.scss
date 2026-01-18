@@ -602,6 +602,7 @@ $border-slate: #334155;
     color: #f1f5f9;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -1589,6 +1590,7 @@ $light-text-muted: #64748b;
     margin-bottom: 0.75rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 

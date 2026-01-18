@@ -277,7 +277,7 @@ const DashboardFeed = () => {
                             <div className={styles.logoIcon}>
                                 <span className="material-symbols-outlined">balance</span>
                             </div>
-                            <span className={styles.logoText} onClick={() => navigate('/')}>Polarys.</span>
+                            <span className={styles.logoText} onClick={() => navigate('/')}>Polaryx.</span>
                         </div>
                         <nav className={styles.nav}>
                             <a href="#" className={styles.navLinkActive}>Feed</a>
