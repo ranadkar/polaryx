@@ -4,6 +4,15 @@ import { useNavigate } from 'react-router-dom';
 
 const LandingNav = () => {
     const navigate = useNavigate();
+
+    const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+        e.preventDefault();
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
     return (
         <header className={styles.header}>
             <div className={styles.container}>
@@ -14,10 +23,9 @@ const LandingNav = () => {
                     <span className={styles.logoText} onClick={() => navigate('/')}>Polaryx.</span>
                 </div>
                 <nav className={styles.nav}>
-                    <a className={styles.navLink} href="#methodology">Methodology</a>
-                    <a className={styles.navLink} href="#conservative">Viewpoints</a>
-                    <a className={styles.navLink} href="#challenge">Verification</a>
-                    <a className={styles.navLink} href="#synthesis">Synthesis</a>
+                    <a className={styles.navLink} href="#methodology" onClick={(e) => scrollToSection(e, 'methodology')}>Discourse Mapping</a>
+                    <a className={styles.navLink} href="#conservative" onClick={(e) => scrollToSection(e, 'conservative')}>Data Synthesis</a>
+                    <a className={styles.navLink} href="#challenge" onClick={(e) => scrollToSection(e, 'challenge')}>AI Insights</a>
                 </nav>
                 <div className={styles.actions}>
                     <ThemeToggle />

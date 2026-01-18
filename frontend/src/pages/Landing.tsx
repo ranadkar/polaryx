@@ -36,7 +36,7 @@ const Landing = () => {
               Democratizing Insight in a <span className={styles.heroTitleItalic}>Divided</span> Information Age
             </h1>
             <p className={styles.heroSubtitle}>
-              Comparative linguistics and cluster analysis to decode political discourse, stripping away rhetoric to reveal core disagreements and shared realities.
+              AI-powered sentiment analysis and bias classification to decode political discourse, revealing how different perspectives frame the same issues.
             </p>
             <div className={styles.searchBox}>
               <form className={styles.searchForm} onSubmit={handleSubmit}>
@@ -87,52 +87,58 @@ const Landing = () => {
             <div className={styles.sectionGrid}>
               <div className={`${styles.contentWrapper} ${styles.contentOrder2}`}>
                 <div className={styles.sectionLabel}>
-                  <span className={`${styles.sectionLabelText} ${styles.sectionLabelBlue}`}>01 — Linguistic Patterns</span>
+                  <span className={`${styles.sectionLabelText} ${styles.sectionLabelBlue}`}>01 — Discourse Mapping</span>
                   <div className={`${styles.sectionLabelLine} ${styles.sectionLabelLineBlue}`}></div>
                 </div>
-                <h2 className={styles.sectionTitle}>Liberal Narrative Analysis</h2>
+                <h2 className={styles.sectionTitle}>Compare Political Bases</h2>
                 <p className={styles.sectionDescription}>
-                  Our algorithm maps the semantic density of Liberal discourse across major news outlets and social media platforms such as Reddit and bluesky. We isolate specific value-anchors—such as systemic equity and collective welfare—that define the core arguments within these information silos.
+                  Our engine visualizes the distinct narrative landscapes of modern politics. We identify and separate conservative and liberal clusters sourced directly from major news and social media outlets.
                 </p>
                 <div className={styles.featureCards}>
                   <div className={`${styles.featureCard} ${styles.featureCardBlue}`}>
-                    <h4 className={styles.featureCardTitle}>Signal Identification</h4>
-                    <p className={styles.featureCardDesc}>Identifying cross-citation patterns across Reddit threads, Bluesky conversations, and news articles.</p>
+                    <h4 className={styles.featureCardTitle}>Multi-Platform Aggregation</h4>
+                    <p className={styles.featureCardDesc}>Real-time search across Reddit, Bluesky, and major news outlets to capture diverse political perspectives on any topic.</p>
                   </div>
                   <div className={`${styles.featureCard} ${styles.featureCardBlue}`}>
-                    <h4 className={styles.featureCardTitle}>Sentiment Variance</h4>
-                    <p className={styles.featureCardDesc}>Measuring the internal consistency of discourse across social media platforms and news coverage.</p>
+                    <h4 className={styles.featureCardTitle}>Bias Classification</h4>
+                    <p className={styles.featureCardDesc}>Machine learning models automatically identify political leaning of each source to separate liberal and conservative viewpoints.</p>
                   </div>
                 </div>
               </div>
               <div className={`${styles.contentOrder1}`}>
-                <div className={`${styles.visualizationCard} ${styles.visualizationCardBlue}`}>
-                  <div className={`${styles.visualizationInner} ${styles.visualizationInnerBlue}`}>
-                    <div className={styles.visualizationHeader}>
-                      <div className={`${styles.datasetLabel} ${styles.datasetLabelBlue}`}>DATASET_LIB_ALPHA</div>
-                      <span className={`material-symbols-outlined ${styles.visualizationIconBlue}`}>hub</span>
+                <div className={styles.comparisonCard}>
+                  <div className={styles.comparisonInner}>
+                    <div className={styles.comparisonHeader}>
+                      <div className={styles.comparisonLabel}>BASE_COMPARISON_V1</div>
+                      <span className={`material-symbols-outlined ${styles.comparisonIcon}`}>groups</span>
                     </div>
-                    <div className={styles.visualizationSvgWrapper}>
-                      <svg className={styles.visualizationSvg} viewBox="0 0 200 200">
-                        <circle cx="100" cy="100" fill="none" r="80" stroke="#3B82F6" strokeDasharray="4 4" strokeWidth="0.5"></circle>
-                        <circle cx="100" cy="100" fill="#3B82F6" fillOpacity="0.1" r="40"></circle>
+                    <div className={styles.comparisonSvgWrapper}>
+                      <svg className={styles.comparisonSvg} viewBox="0 0 200 200">
+                        <circle cx="70" cy="100" fill="#3B82F6" fillOpacity="0.1" r="50"></circle>
+                        <circle cx="70" cy="100" fill="none" r="50" stroke="#3B82F6" strokeDasharray="2 2" strokeWidth="0.5"></circle>
+                        <circle cx="130" cy="100" fill="#EF4444" fillOpacity="0.1" r="50"></circle>
+                        <circle cx="130" cy="100" fill="none" r="50" stroke="#EF4444" strokeDasharray="2 2" strokeWidth="0.5"></circle>
                         <g style={{ color: '#3B82F6' }}>
-                          <circle cx="60" cy="70" fill="currentColor" r="4"></circle>
-                          <circle cx="140" cy="120" fill="currentColor" r="6"></circle>
-                          <circle cx="80" cy="150" fill="currentColor" r="3"></circle>
-                          <circle cx="120" cy="50" fill="currentColor" r="5"></circle>
-                          <line opacity="0.3" stroke="currentColor" strokeWidth="0.5" x1="60" x2="100" y1="70" y2="100"></line>
-                          <line opacity="0.3" stroke="currentColor" strokeWidth="0.5" x1="140" x2="100" y1="120" y2="100"></line>
+                          <circle cx="50" cy="80" fill="currentColor" r="4"></circle>
+                          <circle cx="80" cy="110" fill="currentColor" r="5"></circle>
+                          <circle cx="60" cy="120" fill="currentColor" r="3"></circle>
                         </g>
+                        <g style={{ color: '#EF4444' }}>
+                          <circle cx="150" cy="80" fill="currentColor" r="4"></circle>
+                          <circle cx="120" cy="110" fill="currentColor" r="5"></circle>
+                          <circle cx="140" cy="120" fill="currentColor" r="3"></circle>
+                        </g>
+                        <line opacity="0.3" stroke="#94A3B8" strokeWidth="0.5" x1="80" x2="120" y1="110" y2="110"></line>
                       </svg>
                     </div>
-                    <div className={styles.cohesionBar}>
-                      <div className={`${styles.cohesionBarTrack} ${styles.cohesionBarTrackBlue}`}>
-                        <div className={`${styles.cohesionBarFill} ${styles.cohesionBarFillBlue}`}></div>
+                    <div className={styles.comparisonFooter}>
+                      <div className={styles.comparisonBars}>
+                        <div className={styles.comparisonBarBlue}></div>
+                        <div className={styles.comparisonBarRed}></div>
                       </div>
-                      <div className={styles.cohesionLabels}>
-                        <span>COHESION INDEX</span>
-                        <span>88.4%</span>
+                      <div className={styles.comparisonLabels}>
+                        <span>LIBERAL CLUSTERS</span>
+                        <span>CONSERVATIVE CLUSTERS</span>
                       </div>
                     </div>
                   </div>
@@ -150,30 +156,30 @@ const Landing = () => {
                 <div className={`${styles.visualizationCard} ${styles.visualizationCardRed}`}>
                   <div className={`${styles.visualizationInner} ${styles.visualizationInnerRed}`}>
                     <div className={styles.visualizationHeader}>
-                      <div className={`${styles.datasetLabel} ${styles.datasetLabelRed}`}>DATASET_CON_OMEGA</div>
-                      <span className={`material-symbols-outlined ${styles.visualizationIconRed}`}>leaderboard</span>
+                      <div className={`${styles.datasetLabel} ${styles.datasetLabelRed}`}>MEDIA_SYNTHESIS_HUB</div>
+                      <span className={`material-symbols-outlined ${styles.visualizationIconRed}`}>satellite_alt</span>
                     </div>
                     <div className={styles.visualizationSvgWrapper}>
                       <svg className={styles.visualizationSvg} viewBox="0 0 200 200">
                         <rect fill="none" height="160" stroke="#EF4444" strokeDasharray="4 4" strokeWidth="0.5" width="160" x="20" y="20"></rect>
-                        <rect fill="#EF4444" fillOpacity="0.1" height="40" width="40" x="80" y="80"></rect>
-                        <g style={{ color: '#EF4444' }}>
-                          <rect fill="currentColor" height="8" width="8" x="50" y="40"></rect>
-                          <rect fill="currentColor" height="10" width="10" x="150" y="140"></rect>
-                          <rect fill="currentColor" height="6" width="6" x="30" y="160"></rect>
-                          <rect fill="currentColor" height="9" width="9" x="130" y="30"></rect>
-                          <line opacity="0.3" stroke="currentColor" strokeWidth="0.5" x1="54" x2="100" y1="44" y2="100"></line>
-                          <line opacity="0.3" stroke="currentColor" strokeWidth="0.5" x1="155" x2="100" y1="145" y2="100"></line>
-                        </g>
+                        <rect fill="#EF4444" fillOpacity="0.1" height="30" rx="4" width="80" x="60" y="40"></rect>
+                        <text fill="#EF4444" fontFamily="sans-serif" fontSize="8" fontWeight="bold" x="78" y="58">FOX NEWS</text>
+                        <rect fill="#3B82F6" fillOpacity="0.1" height="30" rx="4" width="80" x="60" y="85"></rect>
+                        <text fill="#3B82F6" fontFamily="sans-serif" fontSize="8" fontWeight="bold" x="88" y="103">CNN</text>
+                        <rect fill="#10B981" fillOpacity="0.1" height="30" rx="4" width="80" x="60" y="130"></rect>
+                        <text fill="#10B981" fontFamily="sans-serif" fontSize="8" fontWeight="bold" x="82" y="148">REDDIT</text>
+                        <line opacity="0.3" stroke="#334155" strokeWidth="1" x1="140" x2="160" y1="55" y2="100"></line>
+                        <line opacity="0.3" stroke="#334155" strokeWidth="1" x1="140" x2="160" y1="145" y2="100"></line>
+                        <circle cx="160" cy="100" fill="#334155" r="3"></circle>
                       </svg>
                     </div>
-                    <div className={styles.cohesionBar}>
-                      <div className={`${styles.cohesionBarTrack} ${styles.cohesionBarTrackRed}`}>
-                        <div className={`${styles.cohesionBarFill} ${styles.cohesionBarFillRed}`}></div>
+                    <div className={styles.integrationBar}>
+                      <div className={styles.integrationBarTrack}>
+                        <div className={styles.integrationBarFill}></div>
                       </div>
-                      <div className={styles.cohesionLabels}>
-                        <span>COHESION INDEX</span>
-                        <span>91.2%</span>
+                      <div className={styles.integrationLabels}>
+                        <span>SOURCE INTEGRATION</span>
+                        <span>LIVE</span>
                       </div>
                     </div>
                   </div>
@@ -181,21 +187,21 @@ const Landing = () => {
               </div>
               <div className={styles.contentWrapper}>
                 <div className={styles.sectionLabel}>
-                  <span className={`${styles.sectionLabelText} ${styles.sectionLabelRed}`}>02 — Structural Analysis</span>
+                  <span className={`${styles.sectionLabelText} ${styles.sectionLabelRed}`}>02 — Data Integration</span>
                   <div className={`${styles.sectionLabelLine} ${styles.sectionLabelLineRed}`}></div>
                 </div>
-                <h2 className={styles.sectionTitle}>Conservative Reality Anchors</h2>
+                <h2 className={styles.sectionTitle}>Cross-Media Synthesis</h2>
                 <p className={styles.sectionDescription}>
-                  We analyze Conservative discourse across Reddit, Bluesky, and news channels to detect high-relevance topics like institutional trust and fiscal heritage. Our tools filter through the noise to map the underlying policy frameworks.
+                  We analyze discourse from various political perspectives across Reddit, Bluesky, and news outlets. Our AI identifies emotional patterns and narrative differences, filtering high-quality content to reveal how each side frames the debate.
                 </p>
                 <div className={styles.featureCards}>
                   <div className={`${styles.featureCard} ${styles.featureCardRed}`}>
-                    <h4 className={styles.featureCardTitle}>Citation Verification</h4>
-                    <p className={styles.featureCardDesc}>Tracing primary source usage across Reddit, Bluesky, and news outlets to distinguish grassroots sentiment from coordinated messaging.</p>
+                    <h4 className={styles.featureCardTitle}>Sentiment Analysis</h4>
+                    <p className={styles.featureCardDesc}>Advanced NLP algorithms measure emotional tone and intensity across thousands of posts to reveal underlying attitudes.</p>
                   </div>
                   <div className={`${styles.featureCard} ${styles.featureCardRed}`}>
-                    <h4 className={styles.featureCardTitle}>Thematic Stability</h4>
-                    <p className={styles.featureCardDesc}>Tracking the lifecycle of specific policy arguments from social media discussions to mainstream news coverage.</p>
+                    <h4 className={styles.featureCardTitle}>AI-Generated Insights</h4>
+                    <p className={styles.featureCardDesc}>GPT-powered analysis extracts key takeaways from each political perspective and identifies areas of common ground.</p>
                   </div>
                 </div>
               </div>
@@ -237,12 +243,12 @@ const Landing = () => {
               </div>
               <div className={styles.contentWrapper}>
                 <div className={styles.sectionLabel}>
-                  <span className={`${styles.sectionLabelText} ${styles.sectionLabelMuted}`}>03 — Verification</span>
+                  <span className={`${styles.sectionLabelText} ${styles.sectionLabelMuted}`}>03 — AI Analysis</span>
                   <div className={`${styles.sectionLabelLine} ${styles.sectionLabelLineMuted}`}></div>
                 </div>
-                <h2 className={styles.sectionTitle}>Combating Misinformation</h2>
+                <h2 className={styles.sectionTitle}>Intelligent Context & Common Ground</h2>
                 <p className={styles.sectionDescription}>
-                  Polaryx acts as a citation-backed buffer. We don't just "flag" content; we provide an immediate, verifiable record from non-partisan sources like the CBO, BLS, and academic archives.
+                  Our AI assistant analyzes all collected articles to extract key takeaways from each perspective and identify areas of shared concern. Ask questions and get contextualized answers grounded in the actual discourse.
                 </p>
                 {/* <button className={styles.viewProtocolButton}>
                   View Verification Protocol
@@ -253,55 +259,6 @@ const Landing = () => {
           </div>
         </section>
 
-        {/* Synthesis Section */}
-        <section className={styles.synthesisSection} id="synthesis">
-          <div className={styles.synthesisGridBg}></div>
-          <div className={styles.synthesisContainer}>
-            <div className={styles.synthesisHeader}>
-              <span className={styles.synthesisLabel}>Final Stage — Synthesis</span>
-              <h2 className={styles.synthesisTitle}>Bridging the Narrative Gap</h2>
-              <p className={styles.synthesisDescription}>
-                Finding the signal in the noise means looking for where the circles overlap. Our synthesis engine highlights the "Truth Core" of any national debate.
-              </p>
-            </div>
-            <div className={styles.synthesisGrid}>
-              <div className={`${styles.synthesisCard} ${styles.synthesisCardDark}`}>
-                <div className={`${styles.synthesisCardIcon} ${styles.synthesisCardIconBlue}`}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '1.875rem' }}>psychology</span>
-                </div>
-                <h3 className={styles.synthesisCardTitle}>Emotional Mapping</h3>
-                <p className={styles.synthesisCardDesc}>
-                  Detecting shared anxieties that transcend party lines. Often, both sides are identifying the same failure from different perspectives.
-                </p>
-              </div>
-              <div className={`${styles.synthesisCard} ${styles.synthesisCardLight}`}>
-                <div className={styles.consensusVisual}>
-                  <div className={`${styles.consensusCircle} ${styles.consensusCircleBlue}`}></div>
-                  <div className={`${styles.consensusCircle} ${styles.consensusCircleRed}`}></div>
-                  <div className={styles.consensusCenter}>
-                    <div className={styles.consensusCenterIcon}>
-                      <span className="material-symbols-outlined">verified</span>
-                    </div>
-                    <div className={styles.consensusCenterLabel}>Common Ground</div>
-                  </div>
-                </div>
-                <h3 className={styles.synthesisCardTitleCenter}>Consensus Detection</h3>
-                <p className={styles.synthesisCardDescCenter}>
-                  Our engine highlights specific data points that both Liberal and Conservative clusters accept as factually true, providing a foundation for debate.
-                </p>
-              </div>
-              <div className={`${styles.synthesisCard} ${styles.synthesisCardDark}`}>
-                <div className={`${styles.synthesisCardIcon} ${styles.synthesisCardIconRed}`}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '1.875rem' }}>auto_fix_high</span>
-                </div>
-                <h3 className={styles.synthesisCardTitle}>Strategic Reframing</h3>
-                <p className={styles.synthesisCardDesc}>
-                  Polaryx suggests alternative linguistic framings that respect the core values of the opposing side, facilitating more productive dialogue.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}

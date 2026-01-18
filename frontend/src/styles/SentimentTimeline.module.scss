@@ -338,9 +338,12 @@ $border-slate: #334155;
 
     // Fix for white border on click (recharts focus outline)
     :global(.recharts-wrapper),
-    :global(.recharts-surface) {
+    :global(.recharts-surface),
+    :global(.recharts-layer),
+    :global(.recharts-scatter) {
         outline: none !important;
     }
+
 }
 
 .zonePositive,
