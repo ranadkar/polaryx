@@ -84,7 +84,11 @@ OUTLETS = {
     "nbcnews.com": {"source": "NBC News", "bias": "left", "scraper": fetch_nbc},
     "abcnews.go.com": {"source": "ABC News", "bias": "left", "scraper": fetch_abc},
     "foxnews.com": {"source": "Fox News", "bias": "right", "scraper": fetch_fox},
-    "breitbart.com": {"source": "Breitbart", "bias": "right", "scraper": fetch_breitbart},
+    "breitbart.com": {
+        "source": "Breitbart",
+        "bias": "right",
+        "scraper": fetch_breitbart,
+    },
     "nypost.com": {"source": "NY Post", "bias": "right", "scraper": fetch_nypost},
     "oann.com": {"source": "OANN", "bias": "right", "scraper": fetch_oann},
 }
@@ -199,9 +203,7 @@ async def search(q: str):
                 continue
             right_count += 1
 
-        sentiment, sentiment_score = analyze_sentiment(
-            article["title"], clean_content
-        )
+        sentiment, sentiment_score = analyze_sentiment(article["title"], clean_content)
 
         output = {
             "source": source,
@@ -237,8 +239,8 @@ async def search(q: str):
         outputs.append(post)
         articles_by_url[post["url"]] = post
 
-    # Process Bluesky posts
-    bluesky_posts = bluesky_result.get("posts", []) if bluesky_result else []
+    # Process Bluesky posts (now returns list directly like Reddit)
+    bluesky_posts = bluesky_result if bluesky_result else []
 
     # Analyze sentiment and classify bias for Bluesky posts
     bluesky_bias_tasks = [
@@ -267,12 +269,21 @@ async def summary(url: str):
     # Check if the URL exists in our cache
     if url not in articles_by_url:
         return {"error": "URL not found. Please search for content first."}
-    
+
     article = articles_by_url[url]
     source = article.get("source", "")
-    
+
     # Determine if this is a news article that needs scraping
-    if source in ["CNN", "CBS News", "NBC News", "ABC News", "Fox News", "Breitbart", "NY Post", "OANN"]:
+    if source in [
+        "CNN",
+        "CBS News",
+        "NBC News",
+        "ABC News",
+        "Fox News",
+        "Breitbart",
+        "NY Post",
+        "OANN",
+    ]:
         # Check cache first
         if url in scraped_content_cache:
             content_to_summarize = scraped_content_cache[url]
@@ -283,7 +294,7 @@ async def summary(url: str):
                 if domain in url:
                     scraper = info.get("scraper")
                     break
-            
+
             if scraper:
                 try:
                     # Scrape the full content
@@ -299,7 +310,7 @@ async def summary(url: str):
     else:
         # Reddit or Bluesky - use existing content
         content_to_summarize = article.get("contents", "")
-    
+
     # Generate summary using OpenAI
     try:
         title = article.get("title", "")
@@ -319,13 +330,8 @@ Summary (in English):"""
         )
 
         summary_text = response.choices[0].message.content.strip()
-        
-        return {
-            "url": url,
-            "title": title,
-            "source": source,
-            "summary": summary_text
-        }
+
+        return {"url": url, "title": title, "source": source, "summary": summary_text}
     except Exception as e:
         print(f"Error generating summary: {e}")
         return {"error": f"Failed to generate summary: {str(e)}"}
@@ -335,10 +341,10 @@ Summary (in English):"""
 async def insights(articles: list[dict] = Body(...)):
     """
     Generate key takeaways for left and right perspectives, plus common ground.
-    
+
     Args:
         articles: List of dicts with 'url' and 'bias' keys
-    
+
     Returns:
         {
             "key_takeaway_left": str,
@@ -349,19 +355,28 @@ async def insights(articles: list[dict] = Body(...)):
     # Separate articles by bias
     left_articles = []
     right_articles = []
-    
+
     for item in articles:
         url = item.get("url")
         bias = item.get("bias")
-        
+
         if url not in articles_by_url:
             continue
-        
+
         article = articles_by_url[url]
-        
+
         # Get full content if it's a news article
         source = article.get("source", "")
-        if source in ["CNN", "CBS News", "NBC News", "ABC News", "Fox News", "Breitbart", "NY Post", "OANN"]:
+        if source in [
+            "CNN",
+            "CBS News",
+            "NBC News",
+            "ABC News",
+            "Fox News",
+            "Breitbart",
+            "NY Post",
+            "OANN",
+        ]:
             # Check cache first
             if url in scraped_content_cache:
                 content = scraped_content_cache[url]
@@ -371,7 +386,7 @@ async def insights(articles: list[dict] = Body(...)):
                     if domain in url:
                         scraper = info.get("scraper")
                         break
-                
+
                 if scraper:
                     try:
                         full_content = await asyncio.to_thread(scraper, url)
@@ -384,29 +399,27 @@ async def insights(articles: list[dict] = Body(...)):
                     content = article.get("contents", "")
         else:
             content = article.get("contents", "")
-        
+
         article_data = {
             "title": article.get("title", ""),
             "source": source,
-            "content": content[:2000]  # Limit content length
+            "content": content[:2000],  # Limit content length
         }
-        
+
         if bias == "left":
             left_articles.append(article_data)
         elif bias == "right":
             right_articles.append(article_data)
-    
+
     # Build context strings
-    left_context = "\n\n".join([
-        f"[{a['source']}] {a['title']}\n{a['content']}"
-        for a in left_articles
-    ])
-    
-    right_context = "\n\n".join([
-        f"[{a['source']}] {a['title']}\n{a['content']}"
-        for a in right_articles
-    ])
-    
+    left_context = "\n\n".join(
+        [f"[{a['source']}] {a['title']}\n{a['content']}" for a in left_articles]
+    )
+
+    right_context = "\n\n".join(
+        [f"[{a['source']}] {a['title']}\n{a['content']}" for a in right_articles]
+    )
+
     # Generate insights using OpenAI
     try:
         prompt = f"""Analyze the following articles from different political perspectives and provide insights.
@@ -420,27 +433,30 @@ RIGHT-LEANING ARTICLES:
 Provide three things:
 1. key_takeaway_left: A 2-3 sentence key insight or takeaway from the left-leaning perspective
 2. key_takeaway_right: A 2-3 sentence key insight or takeaway from the right-leaning perspective
-3. common_ground: A 2-3 sentence insight about common ground or shared concerns between both perspectives, showing how they're sometimes not so different
+3. common_ground: An array of EXACTLY 3 objects, each with:
+   - "title": A short 2-4 word title for the common ground area (e.g., "Infrastructure Modernization", "Data Privacy Rights", "Energy Security")
+   - "bullet_point": A complete sentence describing the common ground or shared concern in that area
 
-Format your response as JSON with these three keys: key_takeaway_left, key_takeaway_right, common_ground"""
+Format your response as JSON with these three keys: key_takeaway_left (string), key_takeaway_right (string), common_ground (array of 3 objects with title and bullet_point)"""
 
         response = await asyncio.to_thread(
             client.chat.completions.create,
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object"}
+            response_format={"type": "json_object"},
         )
 
         insights_text = response.choices[0].message.content.strip()
-        
+
         # Parse the JSON response
         import json
+
         insights_data = json.loads(insights_text)
-        
+
         return {
             "key_takeaway_left": insights_data.get("key_takeaway_left", ""),
             "key_takeaway_right": insights_data.get("key_takeaway_right", ""),
-            "common_ground": insights_data.get("common_ground", "")
+            "common_ground": insights_data.get("common_ground", ""),
         }
     except Exception as e:
         print(f"Error generating insights: {e}")

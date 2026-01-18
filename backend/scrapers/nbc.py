@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import requests
 from bs4 import BeautifulSoup
 
@@ -13,28 +11,24 @@ def fetch_nbc(url: str, *, timeout_s: float = 10.0) -> str:
     response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
-    
+
     # NBC News typically uses div.article-body__content for article content
     content_body = soup.select_one("div.article-body__content")
     if content_body:
-        # Remove any ads or unwanted elements
-        for unwanted in content_body.select(".ad-container, .advertisement, .related-content"):
+        for unwanted in content_body.select(
+            ".ad-container, .advertisement, .related-content"
+        ):
             unwanted.decompose()
-        
-        # Get all paragraph text
-        paragraphs = [
-            p.get_text(strip=True) for p in content_body.find_all("p")
-        ]
+
+        paragraphs = [p.get_text(strip=True) for p in content_body.find_all("p")]
         return "\n".join(filter(None, paragraphs))
-    
+
     # Fallback: try to find paragraphs in article tag
     article = soup.find("article")
     if article:
-        paragraphs = [
-            p.get_text(strip=True) for p in article.find_all("p")
-        ]
+        paragraphs = [p.get_text(strip=True) for p in article.find_all("p")]
         return "\n".join(filter(None, paragraphs))
-    
+
     return ""
 
 
