@@ -1,14 +1,15 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../lib/store';
-import type { SearchResult } from '../lib/search';
+import { useAppSelector, useAppDispatch } from '../lib/store';
+import { setSelectedIndices, runInsights } from '../lib/searchSlice';
+import type { SearchResult, ArticleForInsights } from '../lib/search';
 import ThemeToggle from '../components/ThemeToggle';
 import styles from '../styles/SelectSources.module.scss';
 
 // Categorize sources
 const LEFT_SOURCES = ['cnn', 'msnbc', 'nyt', 'nytimes', 'washington post', 'huffpost', 'vox', 'slate', 'the guardian'];
 const RIGHT_SOURCES = ['fox', 'foxnews', 'breitbart', 'wsj', 'wall street journal', 'daily wire', 'newsmax', 'oann', 'the blaze'];
-const SOCIAL_SOURCES = ['reddit', 'twitter', 'x.com', 'r/'];
+const SOCIAL_SOURCES = ['reddit', 'twitter', 'x.com', 'r/', 'bluesky', 'bsky'];
 
 function categorizeSource(result: SearchResult): 'left' | 'social' | 'right' {
     const lowerSource = result.source.toLowerCase();
@@ -33,6 +34,14 @@ function categorizeSource(result: SearchResult): 'left' | 'social' | 'right' {
     }
     // Default to social for unknown sources
     return 'social';
+}
+
+function getBiasForSource(result: SearchResult): string {
+    if (result.bias) return result.bias;
+    const category = categorizeSource(result);
+    if (category === 'left') return 'left';
+    if (category === 'right') return 'right';
+    return 'neutral';
 }
 
 function getSourceAbbreviation(source: string): string {
@@ -80,6 +89,13 @@ const TwitterIcon = () => (
     </svg>
 );
 
+// Bluesky SVG icon
+const BlueskyIcon = () => (
+    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 600 530">
+        <path d="m135.72 44.03c66.496 49.921 138.02 151.14 164.28 205.46 26.262-54.316 97.782-155.54 164.28-205.46 47.98-36.021 125.72-63.892 125.72 24.795 0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.3797-3.6904-10.832-3.7077-7.8964-0.0174-2.9357-1.1937 0.51669-3.7077 7.8964-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.26 82.697-152.22-67.108 11.421-142.55-7.4491-163.25-81.433-5.9562-21.282-16.111-152.36-16.111-170.07 0-88.687 77.742-60.816 125.72-24.795z" />
+    </svg>
+);
+
 interface SourceCardProps {
     result: SearchResult;
     category: 'left' | 'social' | 'right';
@@ -122,6 +138,7 @@ const SentimentBar = ({ score }: { score: number }) => {
 const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps) => {
     const isReddit = result.source.toLowerCase().includes('reddit') || result.source.toLowerCase() === 'reddit';
     const isTwitter = result.source.toLowerCase().includes('twitter') || result.source.toLowerCase().includes('x.com');
+    const isBluesky = result.source.toLowerCase().includes('bluesky') || result.source.toLowerCase().includes('bsky');
 
     const cardClass = category === 'left' ? styles.cardBlue : category === 'right' ? styles.cardRed : styles.cardNeutral;
     const checkboxClass = category === 'left' ? '' : category === 'right' ? styles.checkboxRed : styles.checkboxNeutral;
@@ -129,14 +146,19 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
     // Get the date
     const date = result.date;
 
-    // Get upvotes/score
+    // Get upvotes/score (Reddit)
     const upvotes = result.score ?? 0;
 
-    // Get comments count
+    // Get comments count (Reddit)
     const comments = result.num_comments ?? 0;
 
-    // Get author
-    const authorDisplay = result.author;
+    // Get Bluesky stats (likes come as 'score' from backend)
+    const blueskyLikes = result.score ?? 0;
+    const reposts = result.reposts ?? 0;
+    const replies = result.replies ?? 0;
+
+    // Get author - use display_name for Bluesky if available
+    const authorDisplay = isBluesky && result.display_name ? result.display_name : result.author;
 
     // Get subreddit for Reddit posts
     const subreddit = result.subreddit || '';
@@ -147,7 +169,7 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
     };
 
-    const displaySource = isReddit && subreddit ? `r/${subreddit}` : result.source;
+    const displaySource = isReddit && subreddit ? `r/${subreddit}` : isBluesky ? 'Bluesky' : result.source;
 
     return (
         <div
@@ -164,6 +186,10 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
                         <div className={styles.sourceIconTwitter}>
                             <TwitterIcon />
                         </div>
+                    ) : isBluesky ? (
+                        <div className={styles.sourceIconBluesky}>
+                            <BlueskyIcon />
+                        </div>
                     ) : (
                         <div className={styles.sourceIcon}>
                             {getSourceAbbreviation(result.source)}
@@ -174,8 +200,8 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
                             {truncateText(displaySource, 10)}
                         </h3>
                         {authorDisplay && (
-                            <p className={styles.cardAuthor} title={authorDisplay}>
-                                By {truncateText(authorDisplay, 15)}
+                            <p className={styles.cardAuthor} title={isBluesky ? result.author : authorDisplay}>
+                                {isBluesky ? truncateText(authorDisplay, 15) : `By ${truncateText(authorDisplay, 15)}`}
                             </p>
                         )}
                     </div>
@@ -203,7 +229,7 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
                     />
                 </div>
             </div>
-            <p className={styles.cardTitle}>{result.title}</p>
+            <p className={styles.cardTitle}>{result.title || result.contents}</p>
 
             <div className={styles.cardFooter}>
                 <div className={styles.sentimentIndicator}>
@@ -226,6 +252,23 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
                         </div>
                     </div>
                 )}
+
+                {isBluesky && (
+                    <div className={styles.blueskyStats}>
+                        <div className={styles.statItem}>
+                            <span className="material-symbols-outlined">favorite</span>
+                            <span>{formatCount(blueskyLikes)}</span>
+                        </div>
+                        <div className={styles.statItem}>
+                            <span className="material-symbols-outlined">repeat</span>
+                            <span>{formatCount(reposts)}</span>
+                        </div>
+                        <div className={styles.statItem}>
+                            <span className="material-symbols-outlined">chat_bubble</span>
+                            <span>{formatCount(replies)}</span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -233,6 +276,7 @@ const SourceCard = ({ result, category, isSelected, onToggle }: SourceCardProps)
 
 const SelectSources = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const { query, results, status } = useAppSelector((state) => state.search);
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
@@ -250,7 +294,7 @@ const SelectSources = () => {
         }
     }, [status, results, navigate]);
 
-    // Categorize results
+    // Categorize and sort results by date (newest first)
     const categorizedResults = useMemo(() => {
         const left: Array<{ result: SearchResult; index: number }> = [];
         const social: Array<{ result: SearchResult; index: number }> = [];
@@ -266,6 +310,17 @@ const SelectSources = () => {
                 social.push({ result, index });
             }
         });
+
+        // Sort each category by date (newest first)
+        const sortByDate = (a: { result: SearchResult }, b: { result: SearchResult }) => {
+            const dateA = a.result.date ?? 0;
+            const dateB = b.result.date ?? 0;
+            return dateB - dateA;
+        };
+
+        left.sort(sortByDate);
+        social.sort(sortByDate);
+        right.sort(sortByDate);
 
         return { left, social, right };
     }, [results]);
@@ -298,9 +353,31 @@ const SelectSources = () => {
         });
     };
 
-    const handleProceed = () => {
-        // TODO: Navigate to synthesis/results page with selected sources
-        navigate('/search-results');
+    const handleProceed = async () => {
+        const selectedIndicesArray = Array.from(selectedIds);
+
+        // Save selected indices to store
+        dispatch(setSelectedIndices(selectedIndicesArray));
+
+        // Prepare articles for insights (only left and right biased)
+        const articles: ArticleForInsights[] = selectedIndicesArray
+            .map(index => results[index])
+            .filter(result => {
+                const category = categorizeSource(result);
+                return category === 'left' || category === 'right';
+            })
+            .map(result => ({
+                url: result.url,
+                bias: getBiasForSource(result),
+            }));
+
+        // Fetch insights if we have left/right articles
+        if (articles.length > 0) {
+            dispatch(runInsights(articles));
+        }
+
+        // Navigate to dashboard
+        navigate('/dashboard');
     };
 
     const selectedCount = selectedIds.size;
@@ -506,20 +583,18 @@ const SelectSources = () => {
                         </div>
                         <div className={styles.diversityMessage}>
                             {leftSelected > 0 && rightSelected > 0
-                                ? 'Sufficient diversity detected for balanced synthesis.'
+                                ? 'Sufficient diversity detected for balanced analysis.'
                                 : 'Select sources from both sides for balanced analysis.'}
                         </div>
                     </div>
                     <div className={styles.footerRight}>
-                        <div className={styles.versionText}>
-                            Pulse Analysis Engine. v4.2.0-stable
-                        </div>
+
                         <button
                             className={styles.proceedButton}
                             onClick={handleProceed}
                             disabled={selectedCount === 0}
                         >
-                            Proceed to Synthesis
+                            Analyze Sources
                             <span className="material-symbols-outlined">auto_fix_high</span>
                         </button>
                     </div>

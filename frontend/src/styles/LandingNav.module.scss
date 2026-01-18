@@ -17,6 +17,7 @@
   height: 5rem;
   display: flex;
   align-items: center;
+
   justify-content: space-between;
 }
 
@@ -53,7 +54,6 @@
   display: none;
   align-items: center;
   gap: 2.5rem;
-  margin-top: -20px;
 
   @media (min-width: 768px) {
     display: flex;

@@ -45,7 +45,7 @@ $border-high: #CBD5E1;
   display: flex;
   align-items: center;
   justify-content: center;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 5rem;
 }
 
 .gridBgDark {
@@ -375,13 +375,11 @@ $border-high: #CBD5E1;
 .methodologySection {
   padding: 3rem 1.5rem;
   background-color: $editorial-blue-pale;
-  min-height: 700px;
-  max-height: 100vh;
-  height: 100vh;
+  min-height: calc(100vh - 5rem);
   display: flex;
   align-items: center;
   overflow: hidden;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 5rem;
 
   @media (min-height: 800px) {
     padding: 4rem 1.5rem;
@@ -696,13 +694,11 @@ $border-high: #CBD5E1;
 .conservativeSection {
   padding: 3rem 1.5rem;
   background-color: $editorial-red-pale;
-  min-height: 800px;
-  max-height: 100vh;
-  height: 100vh;
+  min-height: calc(100vh - 5rem);
   display: flex;
   align-items: center;
   overflow: hidden;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 5rem;
 
   @media (min-height: 800px) {
     padding: 4rem 1.5rem;
@@ -717,7 +713,7 @@ $border-high: #CBD5E1;
   display: flex;
   align-items: center;
   overflow: hidden;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 5rem;
 
   @media (min-height: 800px) {
     padding: 4rem 1.5rem;
@@ -881,7 +877,7 @@ $border-high: #CBD5E1;
   display: flex;
   align-items: center;
   overflow: hidden;
-  scroll-margin-top: 100px;
+  scroll-margin-top: 5rem;
 
   @media (min-height: 800px) {
     padding: 4rem 1.5rem;

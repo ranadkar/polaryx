@@ -1,18 +1,28 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { fetchSearchResults, type SearchResult } from './search';
+import { fetchSearchResults, fetchInsights, type SearchResult, type InsightsResult, type ArticleForInsights, type SummaryResult } from './search';
 
 interface SearchState {
     query: string;
     results: SearchResult[];
+    selectedIndices: number[];
+    insights: InsightsResult | null;
+    summaries: Record<string, SummaryResult>; // keyed by URL
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    insightsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
+    insightsError: string | null;
 }
 
 const initialState: SearchState = {
     query: '',
     results: [],
+    selectedIndices: [],
+    insights: null,
+    summaries: {},
     status: 'idle',
+    insightsStatus: 'idle',
     error: null,
+    insightsError: null,
 };
 
 export const runSearch = createAsyncThunk<
@@ -28,6 +38,19 @@ export const runSearch = createAsyncThunk<
     }
 });
 
+export const runInsights = createAsyncThunk<
+    InsightsResult,
+    ArticleForInsights[],
+    { rejectValue: string }
+>('search/runInsights', async (articles, { rejectWithValue }) => {
+    try {
+        return await fetchInsights(articles);
+    } catch (err) {
+        const message = err instanceof Error ? err.message : 'Insights request failed';
+        return rejectWithValue(message);
+    }
+});
+
 const searchSlice = createSlice({
     name: 'search',
     initialState,
@@ -35,10 +58,21 @@ const searchSlice = createSlice({
         setQuery(state, action: PayloadAction<string>) {
             state.query = action.payload;
         },
+        setSelectedIndices(state, action: PayloadAction<number[]>) {
+            state.selectedIndices = action.payload;
+        },
+        addSummary(state, action: PayloadAction<SummaryResult>) {
+            state.summaries[action.payload.url] = action.payload;
+        },
         clearResults(state) {
             state.results = [];
+            state.selectedIndices = [];
+            state.insights = null;
+            state.summaries = {};
             state.status = 'idle';
+            state.insightsStatus = 'idle';
             state.error = null;
+            state.insightsError = null;
         },
     },
     extraReducers: (builder) => {
@@ -55,9 +89,21 @@ const searchSlice = createSlice({
             .addCase(runSearch.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload ?? 'Search request failed';
+            })
+            .addCase(runInsights.pending, (state) => {
+                state.insightsStatus = 'loading';
+                state.insightsError = null;
+            })
+            .addCase(runInsights.fulfilled, (state, action) => {
+                state.insightsStatus = 'succeeded';
+                state.insights = action.payload;
+            })
+            .addCase(runInsights.rejected, (state, action) => {
+                state.insightsStatus = 'failed';
+                state.insightsError = action.payload ?? 'Insights request failed';
             });
     },
 });
 
-export const { setQuery, clearResults } = searchSlice.actions;
+export const { setQuery, setSelectedIndices, addSummary, clearResults } = searchSlice.actions;
 export default searchSlice.reducer;

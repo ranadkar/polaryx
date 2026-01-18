@@ -15,11 +15,10 @@ const Loading = () => {
     const { query, status, error } = useAppSelector((state) => state.search);
     const [activeStage, setActiveStage] = useState(0);
     const [completedStages, setCompletedStages] = useState<number[]>([]);
+    const [isAnimationDone, setIsAnimationDone] = useState(false);
 
     // Animate through stages
     useEffect(() => {
-        if (status !== 'loading') return;
-
         const interval = setInterval(() => {
             setActiveStage((prev) => {
                 const next = prev + 1;
@@ -27,23 +26,26 @@ const Loading = () => {
                     setCompletedStages((completed) => [...completed, prev]);
                     return next;
                 }
+
+                setIsAnimationDone(true);
+                clearInterval(interval);
                 return prev;
             });
         }, 1500);
 
         return () => clearInterval(interval);
-    }, [status]);
+    }, []);
 
     // Navigate on success
     useEffect(() => {
-        if (status === 'succeeded') {
+        if (status === 'succeeded' && isAnimationDone) {
             // Small delay to show completion
             const timeout = setTimeout(() => {
                 navigate('/select-sources');
             }, 500);
             return () => clearTimeout(timeout);
         }
-    }, [status, navigate]);
+    }, [status, isAnimationDone, navigate]);
 
     // Redirect if no query
     useEffect(() => {
